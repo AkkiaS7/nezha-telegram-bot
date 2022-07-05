@@ -1,0 +1,40 @@
+before:
+  hooks:
+    - go mod tidy -v
+builds:
+  - id: universal
+    env:
+      - CGO_ENABLED=0
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.arch={{.Arch}}
+    goos:
+      - linux
+    goarch:
+      - 386
+      - arm64
+      - amd64
+      - s390x
+    main: ./
+    binary: nezha-telegram-bot
+universal_binaries:
+  - name_template: "nezha-telegram-bot"
+    replace: false
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "nezha-telegram-bot"
+archives:
+  - name_template: "nezha-telegram-bot_{{ .Os }}_{{ .Arch }}"
+    format: zip
+    files:
+      - none*
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+      - "^chore"
+      - Merge pull request
+      - Merge branch
+      - go mod tidy
