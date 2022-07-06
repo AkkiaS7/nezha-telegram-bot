@@ -6,7 +6,6 @@ import (
 	"github.com/AkkiaS7/nezha-telegram-bot/service"
 	tele "gopkg.in/telebot.v3"
 	"strconv"
-	"time"
 )
 
 func userInit() {
@@ -50,6 +49,6 @@ func seturl(c tele.Context) error {
 		ChatID:    c.Chat().ID,
 	}
 	replyMsg.Save()
-	middleware.DelayDelete(replyMsg, time.Second*10)
+	middleware.DelayDelete(replyMsg)
 	return nil
 }

@@ -1,0 +1,8 @@
+version: "3.3"
+
+services:
+  nezha-telegram-bot:
+    image: ghcr.io/akkias7/nezha-telegram-bot:latest
+    restart: always
+    volumes:
+      - ./data:/nezha-telegram-bot/data

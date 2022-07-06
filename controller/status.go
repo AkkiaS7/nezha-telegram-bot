@@ -7,7 +7,6 @@ import (
 	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm"
 	"strconv"
-	"time"
 )
 
 func statusInit() {
@@ -40,7 +39,7 @@ func getBrief(c tele.Context) error {
 		ChatID:    c.Chat().ID,
 	}
 	replyMsg.Save()
-	middleware.DelayDelete(replyMsg, time.Second*10)
+	middleware.DelayDelete(replyMsg)
 	return nil
 }
 
@@ -67,6 +66,6 @@ func getRank(c tele.Context) error {
 		ChatID:    c.Chat().ID,
 	}
 	replyMsg.Save()
-	middleware.DelayDelete(replyMsg, time.Second*10)
+	middleware.DelayDelete(replyMsg)
 	return nil
 }

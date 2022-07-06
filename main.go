@@ -1,11 +1,11 @@
 package main
 
 import (
-	"flag"
 	"github.com/AkkiaS7/nezha-telegram-bot/controller"
 	"github.com/AkkiaS7/nezha-telegram-bot/middleware"
 	"github.com/AkkiaS7/nezha-telegram-bot/model"
 	"github.com/AkkiaS7/nezha-telegram-bot/service"
+	"github.com/AkkiaS7/nezha-telegram-bot/utils/config"
 	tele "gopkg.in/telebot.v3"
 	"log"
 	"time"
@@ -14,14 +14,10 @@ import (
 var bot *tele.Bot
 
 func init() {
+	config.Init()
 	var err error
-	token := flag.String("token", "", "Telegram bot token")
-	flag.Parse()
-	if *token == "" {
-		log.Println("必须指定token，请使用参数 --token=<token>")
-	}
 	pref := tele.Settings{
-		Token: *token,
+		Token: config.Conf.Token,
 		Poller: &tele.LongPoller{
 			Timeout: 10 * time.Second,
 		},

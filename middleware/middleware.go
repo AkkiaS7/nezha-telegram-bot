@@ -9,5 +9,5 @@ func Init(telebot *tele.Bot) {
 }
 
 func Serve() {
-	go DeleteMsgService()
+	AutoDeleteInit()
 }

@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	gopkg.in/ini.v1 v1.66.6
 	gopkg.in/telebot.v3 v3.0.0
 	gorm.io/driver/sqlite v1.3.5
 	gorm.io/gorm v1.23.6
