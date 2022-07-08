@@ -60,3 +60,7 @@ func (rl *RankList) Save() {
 func (rl *RankList) Delete() {
 	DB.Delete(rl)
 }
+
+func DeleteRankByUserID(userID int64) error {
+	return DB.Delete(&RankList{}, "user_id = ?", userID).Error
+}

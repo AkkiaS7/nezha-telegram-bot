@@ -16,6 +16,8 @@ func StartCronService() {
 }
 
 func RecordAllStatus() {
+	UserMapLock.RLock()
+	defer UserMapLock.RUnlock()
 	for _, user := range ValidUserMap {
 		go RecordRawStatus(user)
 		go GetRankByUserID(user.UserID)

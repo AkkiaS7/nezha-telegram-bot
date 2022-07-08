@@ -4,19 +4,24 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/AkkiaS7/nezha-telegram-bot/model"
 	"github.com/AkkiaS7/nezha-telegram-bot/utils"
 	"github.com/gorilla/websocket"
+	"gorm.io/gorm"
 	"strings"
 	"time"
 )
 
 func GetBriefByUserID(userID int64) (string, error) {
-	url, err := model.GetURLByID(userID)
-	if err != nil {
-		return "", err
+	UserMapLock.RLock()
+	defer UserMapLock.RUnlock()
+	if user, ok := ValidUserMap[userID]; ok {
+		return GetBriefByWebsocket(user.URL)
+	} else if user, ok = InvalidUserMap[userID]; ok {
+		return "", errors.New("无法查询被禁用的账户，请私聊机器人重新设置地址")
+	} else {
+		return "", gorm.ErrRecordNotFound
 	}
-	return GetBriefByWebsocket(url)
+
 }
 
 func GetBriefByWebsocket(url string) (string, error) {

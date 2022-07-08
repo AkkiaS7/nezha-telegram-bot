@@ -1,6 +1,9 @@
 package utils
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 func AutoUnitConvert(value int64) string {
 	if value < 1024 {
@@ -11,8 +14,10 @@ func AutoUnitConvert(value int64) string {
 		return fmt.Sprintf("%.2fM", float64(value)/1024/1024)
 	} else if value < 1024*1024*1024*1024 {
 		return fmt.Sprintf("%.2fG", float64(value)/1024/1024/1024)
-	} else {
+	} else if value < 1024*1024*1024*1024*1024 {
 		return fmt.Sprintf("%.2fT", float64(value)/1024/1024/1024/1024)
+	} else {
+		return fmt.Sprintf("%.2fP", float64(value)/1024/1024/1024/1024/1024)
 	}
 }
 
@@ -29,4 +34,8 @@ func AutoBandwidthConvert(value int64) string {
 	} else {
 		return fmt.Sprintf("%.2fTbps", float64(value)/1024/1024/1024/1024)
 	}
+}
+
+func ParseAllDot(str string) string {
+	return strings.Replace(str, ".", "\\.", -1)
 }

@@ -32,7 +32,7 @@ func init() {
 	controller.Init(bot)
 	middleware.Init(bot)
 	model.Init()
-	service.Init()
+	service.Init(bot)
 }
 
 func main() {

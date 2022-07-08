@@ -18,8 +18,10 @@ func seturl(c tele.Context) error {
 	userID := c.Sender().ID
 	args := c.Args()
 	msg := ""
-	if len(args) < 1 || len(args) > 2 {
-		msg = "参数错误 请使用 /seturl <url> 需要包含http/https标识"
+	if c.Message().FromGroup() {
+		msg = "为了保护您的隐私，请私聊本bot进行url的设置"
+	} else if len(args) < 1 || len(args) > 2 {
+		msg = "参数错误 请使用 /seturl <url> 命令注册，需要包含http/https标识"
 	} else {
 		url := args[0]
 		token := ""
@@ -28,9 +30,12 @@ func seturl(c tele.Context) error {
 		}
 
 		u := service.UserMgr{
-			ID:    userID,
-			URL:   url,
-			Token: token,
+			UserID:    userID,
+			UserName:  c.Sender().Username,
+			FirstName: c.Sender().FirstName,
+			LastName:  c.Sender().LastName,
+			URL:       url,
+			Token:     token,
 		}
 
 		if err := u.SetURL(); err == nil {

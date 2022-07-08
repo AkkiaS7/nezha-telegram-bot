@@ -13,6 +13,7 @@ func Init(telebot *tele.Bot) {
 	bot = telebot
 	userInit()
 	statusInit()
+	rankListInit()
 }
 
 func Serve() {
