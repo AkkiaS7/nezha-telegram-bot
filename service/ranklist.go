@@ -50,7 +50,6 @@ func GetRankByUserID(userID int64) (string, error) {
 		return "", errors.New("无法查询被禁用的账户，请私聊机器人重新设置地址")
 	}
 	UserMapLock.RUnlock()
-
 	rankList := model.RankList{}
 	rankList.UserID = userID
 	for _, v := range tmp.Servers {
@@ -73,7 +72,6 @@ func GetRankByUserID(userID int64) (string, error) {
 	load15Rank := "未上榜"
 
 	rankLock.RLock()
-	defer rankLock.RUnlock()
 	for i, v := range ServerCountRankList {
 		if v.ServerCount < rankList.ServerCount || v.UserID == userID {
 			serverCountRank = "排名[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(ServerCountRankList)) + "]"
@@ -139,6 +137,7 @@ func GetRankByUserID(userID int64) (string, error) {
 	if load15Rank == "未上榜" && len(Load15RankList) < maxRankList {
 		load15Rank = "排名[" + strconv.Itoa(len(Load15RankList)+1) + "/" + strconv.Itoa(len(MemTotalRankList)+1) + "]"
 	}
+	rankLock.RUnlock()
 	if memUsedRank != "未上榜" || memTotalRank != "未上榜" || diskUsedRank != "未上榜" || diskTotalRank != "未上榜" || load15Rank != "未上榜" {
 		rankList.Save()
 		rankListInit()
