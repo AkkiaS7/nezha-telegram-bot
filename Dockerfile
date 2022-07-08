@@ -1,13 +1,11 @@
-FROM golang:alpine AS binarybuilder
-RUN apk --no-cache --no-progress add \
-    gcc git musl-dev
-WORKDIR /nezha-telegram-bot
-COPY . .
-RUN go build -o app -ldflags="-s -w"
+FROM ubuntu:focal
 
-FROM alpine:latest
+ENV TZ="Asia/Shanghai"
+
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /nezha-telegram-bot
-COPY --from=binarybuilder /nezha-telegram-bot/app ./app
+COPY dist/nezha-telegram-bot-${TARGETOS}-${TARGETARCH} ./app
 
 CMD ["./app"]

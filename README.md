@@ -16,3 +16,9 @@ cp data/config.example.ini data/config.ini
 nano data/config.ini
 ```
 修改完成后，运行 `docker-compose up -d`
+
+
+## Credits
+
+https://github.com/naiba/nezha
+https://github.com/tucnak/telebot
