@@ -163,11 +163,11 @@ func GetRankList(rank int) string {
 	msg := "正在显示各指标排名第" + strconv.Itoa(rank) + "的数据:\n"
 	msg += "服务器数量: " + strconv.Itoa(ServerCountRankList[rank-1].ServerCount) + "用户: " + GetATAbleStringByUserID(ServerCountRankList[rank-1].UserID) + "\n"
 	msg += "在线服务器数量: " + strconv.Itoa(OnlineCountRankList[rank-1].OnlineCount) + "用户: " + GetATAbleStringByUserID(OnlineCountRankList[rank-1].UserID) + "\n"
-	msg += "内存总量: " + utils.ParseAllDot(utils.AutoUnitConvert(MemTotalRankList[rank-1].MemTotal)) + "用户: " + GetATAbleStringByUserID(MemTotalRankList[rank-1].UserID) + "\n"
-	msg += "内存使用量: " + utils.ParseAllDot(utils.AutoUnitConvert(MemUsedRankList[rank-1].MemUsedTotal)) + "用户: " + GetATAbleStringByUserID(MemUsedRankList[rank-1].UserID) + "\n"
-	msg += "磁盘总量: " + utils.ParseAllDot(utils.AutoUnitConvert(DiskTotalRankList[rank-1].DiskTotal)) + "用户: " + GetATAbleStringByUserID(DiskTotalRankList[rank-1].UserID) + "\n"
-	msg += "磁盘使用量: " + utils.ParseAllDot(utils.AutoUnitConvert(DiskUsedRankList[rank-1].DiskUsedTotal)) + "用户: " + GetATAbleStringByUserID(DiskUsedRankList[rank-1].UserID) + "\n"
-	msg += "总负载: " + utils.ParseAllDot(fmt.Sprintf("%.2f", Load15RankList[rank-1].Load15Total)) + "用户: " + GetATAbleStringByUserID(Load15RankList[rank-1].UserID) + "\n"
+	msg += "内存总量: " + utils.ParseForMarkdown(utils.AutoUnitConvert(MemTotalRankList[rank-1].MemTotal)) + "用户: " + GetATAbleStringByUserID(MemTotalRankList[rank-1].UserID) + "\n"
+	msg += "内存使用量: " + utils.ParseForMarkdown(utils.AutoUnitConvert(MemUsedRankList[rank-1].MemUsedTotal)) + "用户: " + GetATAbleStringByUserID(MemUsedRankList[rank-1].UserID) + "\n"
+	msg += "磁盘总量: " + utils.ParseForMarkdown(utils.AutoUnitConvert(DiskTotalRankList[rank-1].DiskTotal)) + "用户: " + GetATAbleStringByUserID(DiskTotalRankList[rank-1].UserID) + "\n"
+	msg += "磁盘使用量: " + utils.ParseForMarkdown(utils.AutoUnitConvert(DiskUsedRankList[rank-1].DiskUsedTotal)) + "用户: " + GetATAbleStringByUserID(DiskUsedRankList[rank-1].UserID) + "\n"
+	msg += "总负载: " + utils.ParseForMarkdown(fmt.Sprintf("%.2f", Load15RankList[rank-1].Load15Total)) + "用户: " + GetATAbleStringByUserID(Load15RankList[rank-1].UserID) + "\n"
 	return msg
 }
 
@@ -186,5 +186,5 @@ func GetATAbleStringByUserID(userID int64) string {
 	if user.UserName != "" {
 		return "[" + name + "](t.me/" + user.UserName + ")"
 	}
-	return "`" + name + "`"
+	return "`" + utils.ParseForMarkdown(name) + "`"
 }

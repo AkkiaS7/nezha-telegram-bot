@@ -36,6 +36,11 @@ func AutoBandwidthConvert(value int64) string {
 	}
 }
 
-func ParseAllDot(str string) string {
-	return strings.Replace(str, ".", "\\.", -1)
+func ParseForMarkdown(str string) string {
+	// TODO: 后续需要优化
+	strList := []string{"_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"}
+	for _, v := range strList {
+		str = strings.Replace(str, v, "\\"+v, -1)
+	}
+	return str
 }
