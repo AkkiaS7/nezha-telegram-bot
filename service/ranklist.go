@@ -11,7 +11,10 @@ import (
 )
 
 const (
-	maxRankList = 20
+	maxRankList        = 20
+	ErrRankOverflow    = "无当前排名数据"
+	ErrNoMoreRank      = "后续无排名数据"
+	ErrUnknownRankType = "未知排名类型"
 )
 
 var (
@@ -154,9 +157,18 @@ func GetRankByUserID(userID int64) (string, error) {
 	return str, nil
 }
 
-func GetRankList(rank int) string {
+func GetRankList(rankType string, rank int) (string, error) {
+	switch rankType {
+	case "all":
+		return GetAllRankList(rank)
+	default:
+		return GetSepRankList(rankType, rank)
+	}
+}
+
+func GetAllRankList(rank int) (string, error) {
 	if rank > len(ServerCountRankList) {
-		return "无数据"
+		return "", errors.New(ErrRankOverflow)
 	}
 	rankLock.RLock()
 	defer rankLock.RUnlock()
@@ -168,7 +180,84 @@ func GetRankList(rank int) string {
 	msg += "磁盘总量: " + utils.ParseForMarkdown(utils.AutoUnitConvert(DiskTotalRankList[rank-1].DiskTotal)) + "用户: " + GetATAbleStringByUserID(DiskTotalRankList[rank-1].UserID) + "\n"
 	msg += "磁盘使用量: " + utils.ParseForMarkdown(utils.AutoUnitConvert(DiskUsedRankList[rank-1].DiskUsedTotal)) + "用户: " + GetATAbleStringByUserID(DiskUsedRankList[rank-1].UserID) + "\n"
 	msg += "总负载: " + utils.ParseForMarkdown(fmt.Sprintf("%.2f", Load15RankList[rank-1].Load15Total)) + "用户: " + GetATAbleStringByUserID(Load15RankList[rank-1].UserID) + "\n"
-	return msg
+	if rank+1 > len(ServerCountRankList) {
+		return msg, errors.New(ErrNoMoreRank)
+	}
+	return msg, nil
+}
+
+func GetSepRankList(rankType string, rankPage int) (string, error) {
+	rankLock.RLock()
+	defer rankLock.RUnlock()
+	if (rankPage-1)*10 > len(ServerCountRankList) {
+		return "", errors.New(ErrRankOverflow)
+	}
+	msg := ""
+	switch rankType {
+	case "serverCount":
+		msg = "正在显示服务器总数排行榜第" + strconv.Itoa(rankPage) + "页的数据:\n"
+		for i := (rankPage - 1) * 10; i < rankPage*10; i++ {
+			if i >= len(ServerCountRankList) {
+				break
+			}
+			msg += "排名\\[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(ServerCountRankList)) + "\\] " + strconv.Itoa(ServerCountRankList[i].ServerCount) + " 用户: " + GetATAbleStringByUserID(ServerCountRankList[i].UserID) + "\n"
+		}
+
+	case "onlineCount":
+		msg = "正在显示在线服务器数量排行榜第" + strconv.Itoa(rankPage) + "页的数据:\n"
+		for i := (rankPage - 1) * 10; i < rankPage*10; i++ {
+			if i >= len(OnlineCountRankList) {
+				break
+			}
+			msg += "排名\\[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(OnlineCountRankList)) + "\\] " + strconv.Itoa(OnlineCountRankList[i].OnlineCount) + " 用户: " + GetATAbleStringByUserID(OnlineCountRankList[i].UserID) + "\n"
+		}
+	case "ramTotal":
+		msg = "正在显示内存总量排行榜第" + strconv.Itoa(rankPage) + "页的数据:\n"
+		for i := (rankPage - 1) * 10; i < rankPage*10; i++ {
+			if i >= len(MemTotalRankList) {
+				break
+			}
+			msg += "排名\\[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(MemTotalRankList)) + "\\] " + utils.ParseForMarkdown(utils.AutoUnitConvert(MemTotalRankList[i].MemTotal)) + " 用户: " + GetATAbleStringByUserID(MemTotalRankList[i].UserID) + "\n"
+		}
+	case "ramUsed":
+		msg = "正在显示内存使用量排行榜第" + strconv.Itoa(rankPage) + "页的数据:\n"
+		for i := (rankPage - 1) * 10; i < rankPage*10; i++ {
+			if i >= len(MemUsedRankList) {
+				break
+			}
+			msg += "排名\\[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(MemUsedRankList)) + "\\] " + utils.ParseForMarkdown(utils.AutoUnitConvert(MemUsedRankList[i].MemUsedTotal)) + " 用户: " + GetATAbleStringByUserID(MemUsedRankList[i].UserID) + "\n"
+		}
+	case "diskTotal":
+		msg = "正在显示磁盘总量排行榜第" + strconv.Itoa(rankPage) + "页的数据:\n"
+		for i := (rankPage - 1) * 10; i < rankPage*10; i++ {
+			if i >= len(DiskTotalRankList) {
+				break
+			}
+			msg += "排名\\[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(DiskTotalRankList)) + "\\] " + utils.ParseForMarkdown(utils.AutoUnitConvert(DiskTotalRankList[i].DiskTotal)) + " 用户: " + GetATAbleStringByUserID(DiskTotalRankList[i].UserID) + "\n"
+		}
+	case "diskUsed":
+		msg = "正在显示磁盘使用量排行榜第" + strconv.Itoa(rankPage) + "页的数据:\n"
+		for i := (rankPage - 1) * 10; i < rankPage*10; i++ {
+			if i >= len(DiskUsedRankList) {
+				break
+			}
+			msg += "排名\\[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(DiskUsedRankList)) + "\\] " + utils.ParseForMarkdown(utils.AutoUnitConvert(DiskUsedRankList[i].DiskUsedTotal)) + " 用户: " + GetATAbleStringByUserID(DiskUsedRankList[i].UserID) + "\n"
+		}
+	case "load15":
+		msg = "正在显示15分钟负载排行榜第" + strconv.Itoa(rankPage) + "页的数据:\n"
+		for i := (rankPage - 1) * 10; i < rankPage*10; i++ {
+			if i >= len(Load15RankList) {
+				break
+			}
+			msg += "排名\\[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(Load15RankList)) + "\\] " + fmt.Sprintf("%.2f", Load15RankList[i].Load15Total) + " 用户: " + GetATAbleStringByUserID(Load15RankList[i].UserID) + "\n"
+		}
+	default:
+		return "", errors.New(ErrUnknownRankType)
+	}
+	if rankPage*10 >= len(ServerCountRankList) {
+		return msg, errors.New(ErrNoMoreRank)
+	}
+	return msg, nil
 }
 
 func GetATAbleStringByUserID(userID int64) string {
