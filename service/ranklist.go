@@ -276,7 +276,7 @@ func GetATAbleStringByUserID(userID int64) string {
 		name = user.LastName
 	}
 	if user.UserName != "" {
-		return "[" + name + "](t.me/" + user.UserName + ")"
+		return "[" + utils.ParseForMarkdown(name) + "](t.me/" + user.UserName + ")"
 	}
 	return "`" + utils.ParseForMarkdown(name) + "`"
 }
