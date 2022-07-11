@@ -12,6 +12,7 @@ var (
 type Config struct {
 	Bot
 	AutoDelete
+	RankList
 }
 
 type Bot struct {
@@ -21,6 +22,11 @@ type Bot struct {
 type AutoDelete struct {
 	Enable bool
 	Time   time.Duration
+}
+
+type RankList struct {
+	Enable  bool
+	MaxRank int
 }
 
 func Init() {

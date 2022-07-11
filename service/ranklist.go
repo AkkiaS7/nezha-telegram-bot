@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"github.com/AkkiaS7/nezha-telegram-bot/model"
 	"github.com/AkkiaS7/nezha-telegram-bot/utils"
+	"github.com/AkkiaS7/nezha-telegram-bot/utils/config"
 	"strconv"
 	"sync"
 	"time"
 )
 
 const (
-	maxRankList        = 20
 	ErrRankOverflow    = "无当前排名数据"
 	ErrNoMoreRank      = "后续无排名数据"
 	ErrUnknownRankType = "未知排名类型"
@@ -19,18 +19,21 @@ const (
 
 var (
 	rankLock            = sync.RWMutex{}
-	ServerCountRankList = make([]*model.RankList, maxRankList)
-	OnlineCountRankList = make([]*model.RankList, maxRankList)
-	MemTotalRankList    = make([]*model.RankList, maxRankList)
-	MemUsedRankList     = make([]*model.RankList, maxRankList)
-	DiskTotalRankList   = make([]*model.RankList, maxRankList)
-	DiskUsedRankList    = make([]*model.RankList, maxRankList)
-	Load15RankList      = make([]*model.RankList, maxRankList)
+	maxRankList         int
+	ServerCountRankList []*model.RankList
+	OnlineCountRankList []*model.RankList
+	MemTotalRankList    []*model.RankList
+	MemUsedRankList     []*model.RankList
+	DiskTotalRankList   []*model.RankList
+	DiskUsedRankList    []*model.RankList
+	Load15RankList      []*model.RankList
 )
 
 func rankListInit() {
 	rankLock.Lock()
 	defer rankLock.Unlock()
+	maxRankList = config.Conf.MaxRank
+
 	ServerCountRankList = model.GetServerCountTop(maxRankList)
 	OnlineCountRankList = model.GetOnlineCountTop(maxRankList)
 	MemTotalRankList = model.GetMemTotalTop(maxRankList)
