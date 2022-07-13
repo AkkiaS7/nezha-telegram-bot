@@ -50,9 +50,11 @@ func GetRankByUserID(userID int64) (string, error) {
 	if user, ok := ValidUserMap[userID]; ok {
 		tmp, err = GetWebsocketMsg(user.URL)
 		if err != nil {
+			UserMapLock.RUnlock()
 			return "", err
 		}
 	} else if _, ok := InvalidUserMap[userID]; ok {
+		UserMapLock.RUnlock()
 		return "", errors.New("无法查询被禁用的账户，请私聊机器人重新设置地址")
 	}
 	UserMapLock.RUnlock()
@@ -267,6 +269,7 @@ func GetATAbleStringByUserID(userID int64) string {
 	UserMapLock.RLock()
 	user, ok := ValidUserMap[userID]
 	if !ok {
+		UserMapLock.RUnlock()
 		return "无效用户"
 		// 还需要重新校准排名列表
 	}

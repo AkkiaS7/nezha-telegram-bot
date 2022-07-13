@@ -53,8 +53,8 @@ func InvalidUserMapInit() {
 		panic(err)
 	}
 	UserMapLock.Lock()
-	UserMapLock.Unlock()
 	for _, user := range users {
 		InvalidUserMap[user.UserID] = user
 	}
+	UserMapLock.Unlock()
 }
