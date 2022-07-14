@@ -6,6 +6,7 @@ import (
 	"github.com/AkkiaS7/nezha-telegram-bot/model"
 	"github.com/AkkiaS7/nezha-telegram-bot/utils"
 	"github.com/AkkiaS7/nezha-telegram-bot/utils/config"
+	"gorm.io/gorm"
 	"strconv"
 	"sync"
 	"time"
@@ -56,6 +57,9 @@ func GetRankByUserID(userID int64) (string, error) {
 	} else if _, ok := InvalidUserMap[userID]; ok {
 		UserMapLock.RUnlock()
 		return "", errors.New("无法查询被禁用的账户，请私聊机器人重新设置地址")
+	} else {
+		UserMapLock.RUnlock()
+		return "", gorm.ErrRecordNotFound
 	}
 	UserMapLock.RUnlock()
 	rankList := model.RankList{}

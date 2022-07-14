@@ -9,7 +9,7 @@ import (
 )
 
 func userInit() {
-	bot.Handle("/seturl", seturl)
+	bot.Handle("/seturl", seturl, middleware.AutoDelete)
 
 	AddCommand("/seturl", "设置URL 需要包含http/https标识")
 }
