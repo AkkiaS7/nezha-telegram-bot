@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -53,7 +54,12 @@ func GetBriefByWebsocket(url string) (string, error) {
 		b.NetInSpeed += v.State.NetInSpeed
 		b.NetOutTransfer += v.State.NetOutTransfer
 		b.NetInTransfer += v.State.NetInTransfer
-		b.CpuTotal += int64(len(v.Host.CPU))
+		var coreCount int64
+		if v.Host.CPU != nil {
+			cpuInfo := strings.Split(v.Host.CPU[0], " ")
+			coreCount, _ = strconv.ParseInt(cpuInfo[len(cpuInfo)-3], 10, 64)
+		}
+		b.CpuTotal += coreCount
 		b.MemTotal += v.Host.MemTotal
 		b.MemUsedTotal += v.State.MemUsed
 		b.DiskTotal += v.Host.DiskTotal
@@ -75,11 +81,11 @@ func GetBriefByWebsocket(url string) (string, error) {
 	}
 	str := fmt.Sprint("在线: ", b.Online, ", 离线: ", b.Offline, "\n",
 		"内存使用率超过80%: ", b.RamOver80, ", [", utils.AutoUnitConvert(b.MemUsedTotal), "/", utils.AutoUnitConvert(b.MemTotal), "]\n",
-		"CPU使用率超过80%: ", b.CPUOver80, ", [", utils.AutoUnitConvert(b.CpuTotal), " 核]\n",
+		"CPU使用率超过80%: ", b.CPUOver80, ", [", b.CpuTotal, " 核]\n",
 		"磁盘使用率超过80%: ", b.DiskOver80, ", [", utils.AutoUnitConvert(b.DiskUsedTotal), "/", utils.AutoUnitConvert(b.DiskTotal), "]\n",
 		"下行流量: ", utils.AutoUnitConvert(b.NetInTransfer), ", 上行流量: ", utils.AutoUnitConvert(b.NetOutTransfer), "\n",
 		"下行带宽: ", utils.AutoBandwidthConvert(int64(b.NetInSpeed)), "， 上行带宽: ", utils.AutoBandwidthConvert(int64(b.NetOutSpeed)), "\n",
-		"下行速度: ", utils.AutoUnitConvert(int64(b.NetInSpeed)), "， 上行速度: ", utils.AutoUnitConvert(int64(b.NetOutSpeed)), "\n")
+		"下行速度: ", utils.AutoUnitConvert(int64(b.NetInSpeed)), "B/s", "， 上行速度: ", utils.AutoUnitConvert(int64(b.NetOutSpeed)), "B/s", "\n")
 
 	return str, nil
 }

@@ -258,7 +258,7 @@ func GetSepRankList(rankType string, rankPage int) (string, error) {
 			if i >= len(Load15RankList) {
 				break
 			}
-			msg += "排名\\[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(Load15RankList)) + "\\] " + fmt.Sprintf("%.2f", Load15RankList[i].Load15Total) + " 用户: " + GetATAbleStringByUserID(Load15RankList[i].UserID) + "\n"
+			msg += "排名\\[" + strconv.Itoa(i+1) + "/" + strconv.Itoa(len(Load15RankList)) + "\\] " + utils.ParseForMarkdown(fmt.Sprintf("%.2f", Load15RankList[i].Load15Total)) + " 用户: " + GetATAbleStringByUserID(Load15RankList[i].UserID) + "\n"
 		}
 	default:
 		return "", errors.New(ErrUnknownRankType)

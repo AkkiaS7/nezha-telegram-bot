@@ -5,6 +5,7 @@ import (
 	"github.com/AkkiaS7/nezha-telegram-bot/middleware"
 	"github.com/AkkiaS7/nezha-telegram-bot/model"
 	"github.com/AkkiaS7/nezha-telegram-bot/service"
+	"github.com/AkkiaS7/nezha-telegram-bot/utils/config"
 	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm"
 	"log"
@@ -38,13 +39,15 @@ func getRank(c tele.Context) error {
 	if err != nil {
 		return err
 	}
-	replyMsg := &model.Message{}
-	replyMsg.StoredMessage = tele.StoredMessage{
-		MessageID: strconv.Itoa(reply.ID),
-		ChatID:    c.Chat().ID,
+	if config.Conf.AutoDelete.Enable {
+		replyMsg := &model.Message{}
+		replyMsg.StoredMessage = tele.StoredMessage{
+			MessageID: strconv.Itoa(reply.ID),
+			ChatID:    c.Chat().ID,
+		}
+		replyMsg.Save()
+		middleware.DelayDelete(replyMsg)
 	}
-	replyMsg.Save()
-	middleware.DelayDelete(replyMsg)
 	return nil
 }
 
@@ -79,8 +82,10 @@ func getRankListMenu(c tele.Context) error {
 		MessageID: strconv.Itoa(reply.ID),
 		ChatID:    c.Chat().ID,
 	}
-	replyMsg.Save()
-	middleware.DelayDelete(replyMsg)
+	if config.Conf.AutoDelete.Enable {
+		replyMsg.Save()
+		middleware.DelayDelete(replyMsg)
+	}
 	return nil
 }
 
@@ -125,12 +130,14 @@ func btnRank(c tele.Context) error {
 		}
 	}
 	err = c.Edit(msg, menu, tele.ModeMarkdownV2, tele.NoPreview)
-	msgModel := &model.Message{
-		StoredMessage: tele.StoredMessage{
-			MessageID: strconv.Itoa(c.Message().ID),
-			ChatID:    c.Chat().ID,
-		},
+	if config.Conf.AutoDelete.Enable {
+		msgModel := &model.Message{
+			StoredMessage: tele.StoredMessage{
+				MessageID: strconv.Itoa(c.Message().ID),
+				ChatID:    c.Chat().ID,
+			},
+		}
+		middleware.DelayDelete(msgModel)
 	}
-	middleware.DelayDelete(msgModel)
 	return err
 }

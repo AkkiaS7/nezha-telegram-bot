@@ -4,6 +4,7 @@ import (
 	"github.com/AkkiaS7/nezha-telegram-bot/middleware"
 	"github.com/AkkiaS7/nezha-telegram-bot/model"
 	"github.com/AkkiaS7/nezha-telegram-bot/service"
+	"github.com/AkkiaS7/nezha-telegram-bot/utils/config"
 	tele "gopkg.in/telebot.v3"
 	"gorm.io/gorm"
 	"strconv"
@@ -31,12 +32,14 @@ func getBrief(c tele.Context) error {
 	if err != nil {
 		return err
 	}
-	replyMsg := &model.Message{}
-	replyMsg.StoredMessage = tele.StoredMessage{
-		MessageID: strconv.Itoa(reply.ID),
-		ChatID:    c.Chat().ID,
+	if config.Conf.AutoDelete.Enable {
+		replyMsg := &model.Message{}
+		replyMsg.StoredMessage = tele.StoredMessage{
+			MessageID: strconv.Itoa(reply.ID),
+			ChatID:    c.Chat().ID,
+		}
+		replyMsg.Save()
+		middleware.DelayDelete(replyMsg)
 	}
-	replyMsg.Save()
-	middleware.DelayDelete(replyMsg)
 	return nil
 }
