@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/AkkiaS7/nezha-telegram-bot/utils"
 	"github.com/gorilla/websocket"
 	"gorm.io/gorm"
-	"strings"
-	"time"
 )
 
 func GetBriefByUserID(userID int64) (string, error) {
@@ -16,7 +17,7 @@ func GetBriefByUserID(userID int64) (string, error) {
 	defer UserMapLock.RUnlock()
 	if user, ok := ValidUserMap[userID]; ok {
 		return GetBriefByWebsocket(user.URL)
-	} else if user, ok = InvalidUserMap[userID]; ok {
+	} else if _, ok = InvalidUserMap[userID]; ok {
 		return "", errors.New("无法查询被禁用的账户，请私聊机器人重新设置地址")
 	} else {
 		return "", gorm.ErrRecordNotFound
@@ -39,6 +40,11 @@ func GetBriefByWebsocket(url string) (string, error) {
 		NetOutTransfer int64
 		NetInSpeed     int
 		NetOutSpeed    int
+		MemUsedTotal,
+		MemTotal,
+		DiskUsedTotal,
+		DiskTotal,
+		CpuTotal int64
 	}
 
 	b := &brief{}
@@ -47,6 +53,11 @@ func GetBriefByWebsocket(url string) (string, error) {
 		b.NetInSpeed += v.State.NetInSpeed
 		b.NetOutTransfer += v.State.NetOutTransfer
 		b.NetInTransfer += v.State.NetInTransfer
+		b.CpuTotal += int64(len(v.Host.CPU))
+		b.MemTotal += v.Host.MemTotal
+		b.MemUsedTotal += v.State.MemUsed
+		b.DiskTotal += v.Host.DiskTotal
+		b.DiskUsedTotal += v.State.DiskUsed
 		if v.LastActive.Unix() > time.Now().Unix()-30 {
 			b.Online++
 		} else {
@@ -63,11 +74,12 @@ func GetBriefByWebsocket(url string) (string, error) {
 		}
 	}
 	str := fmt.Sprint("在线: ", b.Online, ", 离线: ", b.Offline, "\n",
-		"内存使用率超过80%: ", b.RamOver80, "\n",
-		"CPU使用率超过80%: ", b.CPUOver80, "\n",
-		"磁盘使用率超过80%: ", b.DiskOver80, "\n",
+		"内存使用率超过80%: ", b.RamOver80, ", [", utils.AutoUnitConvert(b.MemUsedTotal), "/", utils.AutoUnitConvert(b.MemTotal), "]\n",
+		"CPU使用率超过80%: ", b.CPUOver80, ", [", utils.AutoUnitConvert(b.CpuTotal), " 核]\n",
+		"磁盘使用率超过80%: ", b.DiskOver80, ", [", utils.AutoUnitConvert(b.DiskUsedTotal), "/", utils.AutoUnitConvert(b.DiskTotal), "]\n",
 		"下行流量: ", utils.AutoUnitConvert(b.NetInTransfer), ", 上行流量: ", utils.AutoUnitConvert(b.NetOutTransfer), "\n",
-		"下行带宽: ", utils.AutoBandwidthConvert(int64(b.NetInSpeed)), "， 上行带宽: ", utils.AutoBandwidthConvert(int64(b.NetOutSpeed)), "\n")
+		"下行带宽: ", utils.AutoBandwidthConvert(int64(b.NetInSpeed)), "， 上行带宽: ", utils.AutoBandwidthConvert(int64(b.NetOutSpeed)), "\n",
+		"下行速度: ", utils.AutoUnitConvert(int64(b.NetInSpeed)), "， 上行速度: ", utils.AutoUnitConvert(int64(b.NetOutSpeed)), "\n")
 
 	return str, nil
 }
@@ -86,7 +98,7 @@ func GetWebsocketMsg(url string) (*WebsocketMsg, error) {
 	}
 	defer conn.Close()
 
-	msgT, msg, err := conn.ReadMessage()
+	msgT, msg, _ := conn.ReadMessage()
 	if msgT != websocket.TextMessage {
 		return nil, errors.New("msg type error")
 	}
