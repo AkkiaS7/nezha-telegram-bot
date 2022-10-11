@@ -7,11 +7,8 @@ import (
 
 func StartCronService() {
 	log.Println("Cron Service Started")
-	for {
-		select {
-		case <-time.Tick(time.Hour):
-			go RecordAllStatus()
-		}
+	for range time.Tick(time.Hour) {
+		go RecordAllStatus()
 	}
 }
 
