@@ -24,7 +24,7 @@ func (um *UserMgr) SetURL() error {
 		return err
 	}
 	if user != nil {
-		return errors.New("更换监控地址将导致所有历史记录被移除\n如果您确定要更换 请使用 /override domain token")
+		return errors.New("更换监控地址将导致所有历史记录被移除\n如果您确定要更换 请使用 /override domain 需要包含http/https标识")
 	}
 	_, err = GetBriefByWebsocket(um.URL)
 	if err != nil {
