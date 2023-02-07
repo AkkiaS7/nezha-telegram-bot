@@ -11,7 +11,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     container:
-      image: goreleaser/goreleaser-cross
+      image: goreleaser/goreleaser-cross:v1.19.5-v1.14.1
     steps:
       - uses: actions/checkout@master
         with:
